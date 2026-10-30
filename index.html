@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mon resto">
+<title>Mon petit resto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFE9A8; --card:#FFFFFF; --ink:#3B2A5A; --soft:#7A6A98;
+  --red:#FF5A4D; --green:#2FBF8A; --blue:#4B7BFF; --line:#F0D27A;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#2B2150; --card:#3A2E68; --ink:#FFF4D6; --soft:#BDB0E0; --line:#54448F;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:'Fredoka','Trebuchet MS','Arial Rounded MT Bold',system-ui,sans-serif;
+  scroll-padding-top:env(safe-area-inset-top,0px)}
+button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation}
+.app{max-width:520px;margin:0 auto;padding:14px 14px 130px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+h1{font-size:26px;margin:0;font-weight:700}
+.caisse{background:var(--card);border-radius:20px;padding:6px 14px;font-weight:600;font-size:15px;text-align:right;line-height:1.2}
+.caisse b{display:block;font-size:20px;color:var(--green)}
+.client{font-size:18px;font-weight:600;margin:0 0 10px;color:var(--soft)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.tab{position:relative;border-radius:18px;padding:9px 13px;font-size:17px;font-weight:600;color:#fff;opacity:.55;box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.tab.on{opacity:1;transform:translateY(-2px);outline:3px solid var(--ink)}
+.tab .badge{width:24px;height:24px;font-size:14px;top:-9px;right:-6px}
+.sub{display:block;font-size:13px;color:var(--soft);line-height:1.1}
+.item{border-top:8px solid var(--c)}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:34px;height:34px;border-radius:50%;background:var(--bg);font-size:20px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.item{background:var(--card);border-radius:24px;padding:12px 8px 10px;text-align:center;position:relative;
+  box-shadow:0 5px 0 var(--line);transition:transform .08s}
+.item:active{transform:translateY(4px);box-shadow:0 1px 0 var(--line)}
+.item .e{font-size:48px;line-height:1.1;display:block}
+.item .n{font-size:17px;line-height:1.15;font-weight:600;display:block}
+.item .p{font-size:17px;color:var(--soft);font-weight:500}
+.badge{position:absolute;top:-6px;right:-4px;background:var(--red);color:#fff;border-radius:50%;
+  width:32px;height:32px;display:grid;place-items:center;font-weight:700;font-size:17px}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));
+  background:var(--card);border-radius:26px 26px 0 0;box-shadow:0 -4px 16px rgba(0,0,0,.12)}
+.bar .in{max-width:520px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.tot{flex:1;font-size:15px;color:var(--soft);line-height:1.2}
+.tot b{display:block;font-size:30px;color:var(--ink)}
+.btn{border-radius:22px;padding:14px 20px;font-size:20px;font-weight:700;color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.btn:disabled{opacity:.4}
+.go{background:var(--green)} .no{background:var(--red)} .bl{background:var(--blue)}
+.small{background:var(--card);color:var(--ink);box-shadow:0 4px 0 var(--line);padding:12px 16px;font-size:17px}
+.ticket{background:var(--card);border-radius:22px;padding:14px 16px;margin-bottom:14px}
+.ticket h2{margin:0 0 6px;font-size:20px}
+.row{display:flex;justify-content:space-between;font-size:18px;padding:3px 0}
+.big{font-size:44px;font-weight:700;text-align:center;margin:6px 0}
+.msg{text-align:center;font-size:21px;font-weight:600;min-height:30px;margin:4px 0 12px}
+.msg.ok{color:var(--green)} .msg.ko{color:var(--red)}
+.money{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.coin{background:#FFD23F;color:#5A3E00;border-radius:20px;padding:14px 4px;font-size:22px;font-weight:700;box-shadow:0 5px 0 #D9A800}
+.coin.bill{background:#7ED9B5;color:#07503A;box-shadow:0 5px 0 #4DB38B}
+.coin:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.center{text-align:center;padding-top:30px}
+.center .huge{font-size:110px;line-height:1}
+.center h2{font-size:34px;margin:10px 0}
+.tpe{background:#2A2A3A;color:#fff;border-radius:26px;padding:22px;text-align:center;margin:10px 0 18px}
+.tpe .screen{background:#C8F5D8;color:#12402B;border-radius:14px;padding:14px;font-size:30px;font-weight:700;margin-bottom:12px}
+.pulse{animation:p 1s infinite}
+@keyframes p{50%{transform:scale(1.15)}}
+@media (prefers-reduced-motion:reduce){.pulse{animation:none}}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+const CATS=[
+ {id:'boissons',n:'Boissons',e:'🥤',c:'#3E9BF2'},
+ {id:'entrees',n:'Entrées',e:'🥗',c:'#3FAE5A'},
+ {id:'pizzas',n:'Pizzas',e:'🍕',c:'#F2557A'},
+ {id:'plats',n:'Plats',e:'🍽️',c:'#F59A1F'},
+ {id:'desserts',n:'Desserts',e:'🍰',c:'#8E6BD6'}
+];
+const MENU=[
+ {id:'cafe',k:'boissons',e:'☕',n:'Café',p:150},
+ {id:'the',k:'boissons',e:'🍵',n:'Thé',p:150},
+ {id:'choc',k:'boissons',e:'🍫',n:'Chocolat chaud',p:200},
+ {id:'orange',k:'boissons',e:'🍊',n:'Jus d’orange',p:150},
+ {id:'pomme',k:'boissons',e:'🍎',n:'Jus de pomme',p:150},
+ {id:'eau',k:'boissons',e:'💧',n:'Eau',p:100},
+ {id:'soupe',k:'entrees',e:'🍲',n:'Soupe de légumes',p:350},
+ {id:'verte',k:'entrees',e:'🥗',n:'Salade verte',p:300},
+ {id:'tomates',k:'entrees',e:'🍅',n:'Tomates mozzarella',p:400},
+ {id:'brusc',k:'entrees',e:'🥖',n:'Bruschetta',p:400},
+ {id:'batonnets',k:'entrees',e:'🧀',n:'Bâtonnets de mozzarella',p:400},
+ {id:'marg',k:'pizzas',e:'🍕',n:'Margherita',p:650},
+ {id:'jambon',k:'pizzas',e:'🍖',n:'Jambon',p:750},
+ {id:'4f',k:'pizzas',e:'🧀',n:'4 fromages',p:800},
+ {id:'reine',k:'pizzas',e:'🍄',n:'Reine',s:'jambon + champignons',p:850},
+ {id:'calzone',k:'pizzas',e:'🥟',n:'Calzone',s:'jambon + fromage',p:900},
+ {id:'steak',k:'plats',e:'🥩',n:'Steak haché',p:700},
+ {id:'nuggets',k:'plats',e:'🍗',n:'Nuggets de poulet',p:700},
+ {id:'poisson',k:'plats',e:'🐟',n:'Poisson pané',p:700},
+ {id:'bolo',k:'plats',e:'🍝',n:'Pâtes bolognaise',p:700},
+ {id:'risotto',k:'plats',e:'🍚',n:'Risotto aux légumes',p:700},
+ {id:'glace',k:'desserts',e:'🍦',n:'Glace',s:'1 boule',p:200},
+ {id:'crepes',k:'desserts',e:'🥞',n:'Crêpe au sucre',p:300},
+ {id:'crepec',k:'desserts',e:'🍫',n:'Crêpe au chocolat',p:350},
+ {id:'tarte',k:'desserts',e:'🥧',n:'Tarte aux fruits',p:400},
+ {id:'fruits',k:'desserts',e:'🍓',n:'Salade de fruits',p:300}
+];
+const BILLS=[10,20,50,100,200,500,1000,2000,5000]; // en centimes
+let S={view:'menu',cat:'boissons',order:{},given:0,client:1,caisse:0,paid:'',change:0};
+const eur=c=>(c/100).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+const total=()=>MENU.reduce((t,m)=>t+m.p*(S.order[m.id]||0),0);
+const count=()=>Object.values(S.order).reduce((a,b)=>a+b,0);
+const $=h=>document.getElementById('app').innerHTML=h;
+
+function add(id){S.order[id]=(S.order[id]||0)+1;render()}
+function less(id){if(S.order[id]>1)S.order[id]--;else delete S.order[id];if(S.view==='ticket'&&!count())S.view='menu';render()}
+function setCat(k){S.cat=k;render()}
+function go(v){S.view=v;render()}
+function give(n){S.given+=n;render()}
+function newOrder(){S.order={};S.given=0;S.client++;S.view='menu';render()}
+function finish(how){
+  S.caisse+=total();S.paid=how;S.change=how==='cash'?S.given-total():0;S.view='done';render()
+}
+function card(){
+  document.getElementById('tpe').innerHTML='<div class="screen pulse">Bip… 📶</div><div>Carte acceptée !</div>';
+  setTimeout(()=>finish('card'),1300);
+}
+
+function header(){
+  return `<header><h1>🍽️ Mon petit resto</h1>
+  <div class="caisse">Caisse<b>${eur(S.caisse)}</b></div></header>`;
+}
+
+function menuView(){
+  const t=total(),c=count(),cur=CATS.find(x=>x.id===S.cat);
+  const nb=k=>MENU.filter(m=>m.k===k).reduce((a,m)=>a+(S.order[m.id]||0),0);
+  return header()+`<p class="client">Client n°${S.client} — touche pour commander</p>
+  <div class="tabs">${CATS.map(k=>`<button class="tab ${k.id===S.cat?'on':''}" style="background:${k.c}" onclick="setCat('${k.id}')">
+    ${k.e} ${k.n}${nb(k.id)?`<span class="badge">${nb(k.id)}</span>`:''}</button>`).join('')}</div>
+  <div class="grid">${MENU.filter(m=>m.k===S.cat).map(m=>{
+    const q=S.order[m.id]||0;
+    return `<button class="item" style="--c:${cur.c}" onclick="add('${m.id}')">${q?`<span class="badge">${q}</span>`:''}
+    <span class="e">${m.e}</span><span class="n">${m.n}</span>${m.s?`<span class="sub">${m.s}</span>`:''}<span class="p">${eur(m.p)}</span></button>`}).join('')}</div>
+  <div class="bar"><div class="in">
+    <div class="tot">${c} article${c>1?'s':''}<b>${eur(t)}</b></div>
+    <button class="btn small" onclick="S.order={};render()" ${c?'':'disabled'}>Vider</button>
+    <button class="btn go" onclick="go('ticket')" ${c?'':'disabled'}>Voir la note</button>
+  </div></div>`;
+}
+
+function lines(){
+  return MENU.filter(m=>S.order[m.id]).map(m=>`<div class="row" style="align-items:center">
+    <span>${m.e} ${m.n}</span>
+    <span class="qty"><button onclick="less('${m.id}')">−</button><b>${S.order[m.id]}</b><button onclick="add('${m.id}')">+</button>
+    <span style="min-width:74px;text-align:right">${eur(m.p*S.order[m.id])}</span></span></div>`).join('');
+}
+
+function ticketView(){
+  return header()+`<div class="ticket"><h2>La note du client n°${S.client}</h2>${lines()}
+  <hr style="border:0;border-top:2px dashed var(--line);margin:10px 0">
+  <div class="row"><b>Total</b><b>${eur(total())}</b></div></div>
+  <div class="actions">
+    <button class="btn small" onclick="go('menu')">← Ajouter</button>
+    <button class="btn go" onclick="S.given=0;go('pay')">💰 Encaisser</button>
+  </div>`;
+}
+
+function payView(){
+  const t=total(),g=S.given,d=g-t;
+  const msg=g===0?'Le client te donne combien ?':d<0?`Il manque ${eur(-d)}`:d===0?'Le compte est bon !':`Rends ${eur(d)} au client`;
+  return header()+`<div class="ticket"><div class="row"><span>À payer</span><b>${eur(t)}</b></div>
+  <div class="row"><span>Le client donne</span><b>${eur(g)}</b></div></div>
+  <div class="msg ${d>=0&&g>0?'ok':d<0&&g>0?'ko':''}">${msg}</div>
+  <div class="money">${BILLS.map(b=>`<button class="coin ${b>=500?'bill':''}" onclick="give(${b})">${b>=500?'💶':'🪙'} ${b>=100?(b/100)+' €':b+' cts'}</button>`).join('')}</div>
+  <div class="actions">
+    <button class="btn small" onclick="S.given=0;render()">Effacer</button>
+    <button class="btn small" onclick="go('ticket')">← Note</button>
+    <button class="btn bl" onclick="go('card')">💳 Carte</button>
+    <button class="btn go" onclick="finish('cash')" ${d>=0&&g>0?'':'disabled'}>✅ Terminé</button>
+  </div>`;
+}
+
+function cardView(){
+  return header()+`<div class="center"><div class="huge">💳</div><h2>Paiement par carte</h2></div>
+  <div class="tpe" id="tpe"><div class="screen">${eur(total())}</div><div>Le client approche sa carte</div></div>
+  <div class="actions">
+    <button class="btn small" onclick="go('pay')">← Retour</button>
+    <button class="btn bl" onclick="card()">📶 Carte approchée</button>
+  </div>`;
+}
+
+function doneView(){
+  const msg=S.paid==='cash'&&S.change>0?`<div class="msg ok">N’oublie pas de rendre ${eur(S.change)} 🪙</div>`:'';
+  return header()+`<div class="center"><div class="huge">🎉</div><h2>Merci et bon appétit !</h2>
+  <p style="font-size:20px">Tu as encaissé ${eur(total())}</p>${msg}
+  <button class="btn go" onclick="newOrder()">Client suivant 👋</button></div>`;
+}
+
+function render(){
+  $({menu:menuView,ticket:ticketView,pay:payView,card:cardView,done:doneView}[S.view]());
+  window.scrollTo(0,0);
+}
+render();
+</script>
+</body>
+</html>
