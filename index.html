@@ -108,6 +108,7 @@ const MENU=[
  {id:'reine',k:'pizzas',e:'🍄',n:'Reine',s:'jambon + champignons',p:850},
  {id:'calzone',k:'pizzas',e:'🥟',n:'Calzone',s:'jambon + fromage',p:900},
  {id:'steak',k:'plats',e:'🥩',n:'Steak haché',p:700},
+ {id:'hamburger',k:'plats',e:'🍔',n:'Hamburger',p:700},
  {id:'nuggets',k:'plats',e:'🍗',n:'Nuggets de poulet',p:700},
  {id:'poisson',k:'plats',e:'🐟',n:'Poisson pané',p:700},
  {id:'bolo',k:'plats',e:'🍝',n:'Pâtes bolognaise',p:700},
@@ -134,7 +135,22 @@ function newOrder(){S.order={};S.given=0;S.client++;S.view='menu';render()}
 function finish(how){
   S.caisse+=total();S.paid=how;S.change=how==='cash'?S.given-total():0;S.view='done';render()
 }
+let AC=null;
+function tone(freq,start,dur){
+  if(!AC)return;
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.type='sine';o.frequency.value=freq;
+  const t=AC.currentTime+start;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.4,t+.01);
+  g.gain.setValueAtTime(.4,t+dur-.02);g.gain.linearRampToValueAtTime(0,t+dur);
+  o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+dur);
+}
 function card(){
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;
+    if(!AC&&C)AC=new C();
+    if(AC){AC.resume();tone(2400,0,.35);tone(2400,.5,.12);tone(2400,.7,.12)}
+  }catch(e){}
   document.getElementById('tpe').innerHTML='<div class="screen pulse">Bip… 📶</div><div>Carte acceptée !</div>';
   setTimeout(()=>finish('card'),1300);
 }
