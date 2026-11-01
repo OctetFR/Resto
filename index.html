@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Mon resto">
-<title>Mon petit resto</title>
+<meta name="apple-mobile-web-app-title" content="Resto Décathlon">
+<title>Resto Décathlon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -27,7 +27,12 @@ html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
   scroll-padding-top:env(safe-area-inset-top,0px)}
 button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation}
 .app{max-width:520px;margin:0 auto;padding:14px 14px 130px}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.logo{flex:1;min-width:0;max-width:270px;display:flex;align-items:center;gap:8px;padding:6px 14px 6px 8px;border-radius:20px;border:3px solid #6B4423;background:linear-gradient(180deg,#F6D49A,#E9B466);box-shadow:0 4px 0 #6B4423}
+.logo .hat{width:38px;height:38px;flex:none}
+.logo .lt{display:flex;flex-direction:column;line-height:1}
+.logo .r{font-size:17px;font-weight:700;color:#4A2C12;letter-spacing:.5px}
+.logo .d{font-size:27px;font-weight:700;color:#2F6BE0;text-shadow:0 2px 0 #fff,0 0 3px #fff}
 h1{font-size:26px;margin:0;font-weight:700}
 .caisse{background:var(--card);border-radius:20px;padding:6px 14px;font-weight:600;font-size:15px;text-align:right;line-height:1.2}
 .caisse b{display:block;font-size:20px;color:var(--green)}
@@ -96,6 +101,7 @@ const MENU=[
  {id:'choc',k:'boissons',e:'🍫',n:'Chocolat chaud',p:200},
  {id:'orange',k:'boissons',e:'🍊',n:'Jus d’orange',p:150},
  {id:'pomme',k:'boissons',e:'🍎',n:'Jus de pomme',p:150},
+ {id:'tomate',k:'boissons',e:'🍅',n:'Jus de tomate',p:150},
  {id:'eau',k:'boissons',e:'💧',n:'Eau',p:100},
  {id:'soupe',k:'entrees',e:'🍲',n:'Soupe de légumes',p:350},
  {id:'verte',k:'entrees',e:'🥗',n:'Salade verte',p:300},
@@ -156,7 +162,9 @@ function card(){
 }
 
 function header(){
-  return `<header><h1>🍽️ Mon petit resto</h1>
+  return `<header><div class="logo" role="img" aria-label="Resto Décathlon">
+    <svg class="hat" viewBox="0 0 48 48" aria-hidden="true"><path d="M14 30c-6 0-9-4-9-8s3-8 8-8c1-5 5-8 11-8s10 3 11 8c5 0 8 4 8 8s-3 8-9 8z" fill="#fff" stroke="#6B4423" stroke-width="2.5" stroke-linejoin="round"/><rect x="13" y="30" width="22" height="11" rx="2" fill="#fff" stroke="#6B4423" stroke-width="2.5"/><path d="M20 33v5M28 33v5" stroke="#B9C7E8" stroke-width="2" stroke-linecap="round"/></svg>
+    <div class="lt"><span class="r">Resto</span><span class="d">Décathlon</span></div></div>
   <div class="caisse">Caisse<b>${eur(S.caisse)}</b></div></header>`;
 }
 
