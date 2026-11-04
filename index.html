@@ -37,6 +37,14 @@ h1{font-size:26px;margin:0;font-weight:700}
 .caisse{background:var(--card);border-radius:20px;padding:6px 14px;font-weight:600;font-size:15px;text-align:right;line-height:1.2}
 .caisse b{display:block;font-size:20px;color:var(--green)}
 .client{font-size:18px;font-weight:600;margin:0 0 10px;color:var(--soft)}
+.veil{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-width:520px;margin:0 auto;background:var(--card);border-radius:26px 26px 0 0;padding:18px 14px calc(16px + env(safe-area-inset-bottom,0px));text-align:center}
+.sheet h2{margin:0 0 12px;font-size:24px}
+.opts{display:grid;gap:10px;margin-bottom:12px}
+.opt{display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:20px;padding:12px 16px;font-size:22px;font-weight:600;box-shadow:0 4px 0 var(--line)}
+.opt:active{transform:translateY(3px);box-shadow:none}
+.opt small{margin-left:auto;font-size:17px;color:var(--soft)}
+.dot{width:34px;height:34px;border-radius:50%;border:3px solid var(--ink);flex:none}
 .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
 .tab{position:relative;border-radius:18px;padding:9px 13px;font-size:17px;font-weight:600;color:#fff;opacity:.55;box-shadow:0 4px 0 rgba(0,0,0,.18)}
 .tab.on{opacity:1;transform:translateY(-2px);outline:3px solid var(--ink)}
@@ -97,6 +105,7 @@ const CATS=[
 ];
 const MENU=[
  {id:'cafe',k:'boissons',e:'☕',n:'Café',p:150},
+ {id:'cappu',k:'boissons',e:'☕',n:'Cappuccino',p:200},
  {id:'the',k:'boissons',e:'🍵',n:'Thé',p:150},
  {id:'choc',k:'boissons',e:'🍫',n:'Chocolat chaud',p:200},
  {id:'orange',k:'boissons',e:'🍊',n:'Jus d’orange',p:150},
@@ -119,21 +128,24 @@ const MENU=[
  {id:'poisson',k:'plats',e:'🐟',n:'Poisson pané',p:700},
  {id:'bolo',k:'plats',e:'🍝',n:'Pâtes bolognaise',p:700},
  {id:'risotto',k:'plats',e:'🍚',n:'Risotto aux légumes',p:700},
- {id:'glace',k:'desserts',e:'🍦',n:'Glace',s:'1 boule',p:200},
- {id:'crepes',k:'desserts',e:'🥞',n:'Crêpe au sucre',p:300},
- {id:'crepec',k:'desserts',e:'🍫',n:'Crêpe au chocolat',p:350},
+ {id:'glace',k:'desserts',e:'🍦',n:'Glace',s:'1 boule',opts:[{n:'Vanille',p:200,c:'#FFE9A0'},{n:'Chocolat',p:200,c:'#8A5233'},{n:'Fraise',p:200,c:'#FF7FA0'}]},
+ {id:'crepe',k:'desserts',e:'🥞',n:'Crêpe',opts:[{n:'Sucre',p:300,c:'#FFF3D0'},{n:'Chocolat',p:350,c:'#8A5233'},{n:'Confiture',p:300,c:'#E0445E'}]},
  {id:'tarte',k:'desserts',e:'🥧',n:'Tarte aux fruits',p:400},
  {id:'fruits',k:'desserts',e:'🍓',n:'Salade de fruits',p:300}
 ];
 const BILLS=[10,20,50,100,200,500,1000,2000,5000]; // en centimes
-let S={view:'menu',cat:'boissons',order:{},given:0,client:1,caisse:0,paid:'',change:0};
+const LINES=MENU.flatMap(m=>m.opts?m.opts.map(o=>({key:m.id+'|'+o.n,m,e:m.e,name:m.n+' · '+o.n,p:o.p,k:m.k})):[{key:m.id,m,e:m.e,name:m.n,p:m.p,k:m.k}]);
+const tp=m=>{if(!m.opts)return eur(m.p);const lo=Math.min(...m.opts.map(o=>o.p));return m.opts.every(o=>o.p===lo)?eur(lo):'dès '+eur(lo)};
+let S={view:'menu',pick:null,cat:'boissons',order:{},given:0,client:1,caisse:0,paid:'',change:0};
 const eur=c=>(c/100).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
-const total=()=>MENU.reduce((t,m)=>t+m.p*(S.order[m.id]||0),0);
+const total=()=>LINES.reduce((t,l)=>t+l.p*(S.order[l.key]||0),0);
 const count=()=>Object.values(S.order).reduce((a,b)=>a+b,0);
 const $=h=>document.getElementById('app').innerHTML=h;
 
 function add(id){S.order[id]=(S.order[id]||0)+1;render()}
 function less(id){if(S.order[id]>1)S.order[id]--;else delete S.order[id];if(S.view==='ticket'&&!count())S.view='menu';render()}
+function tap(id){const m=MENU.find(x=>x.id===id);if(m.opts){S.pick=id;render()}else add(id)}
+function pick(key){S.pick=null;add(key)}
 function setCat(k){S.cat=k;render()}
 function go(v){S.view=v;render()}
 function give(n){S.given+=n;render()}
@@ -168,16 +180,16 @@ function header(){
   <div class="caisse">Caisse<b>${eur(S.caisse)}</b></div></header>`;
 }
 
-function menuView(){
+function menuBase(){
   const t=total(),c=count(),cur=CATS.find(x=>x.id===S.cat);
-  const nb=k=>MENU.filter(m=>m.k===k).reduce((a,m)=>a+(S.order[m.id]||0),0);
+  const nb=k=>LINES.filter(l=>l.k===k).reduce((a,l)=>a+(S.order[l.key]||0),0);
   return header()+`<p class="client">Client n°${S.client} — touche pour commander</p>
   <div class="tabs">${CATS.map(k=>`<button class="tab ${k.id===S.cat?'on':''}" style="background:${k.c}" onclick="setCat('${k.id}')">
     ${k.e} ${k.n}${nb(k.id)?`<span class="badge">${nb(k.id)}</span>`:''}</button>`).join('')}</div>
   <div class="grid">${MENU.filter(m=>m.k===S.cat).map(m=>{
-    const q=S.order[m.id]||0;
-    return `<button class="item" style="--c:${cur.c}" onclick="add('${m.id}')">${q?`<span class="badge">${q}</span>`:''}
-    <span class="e">${m.e}</span><span class="n">${m.n}</span>${m.s?`<span class="sub">${m.s}</span>`:''}<span class="p">${eur(m.p)}</span></button>`}).join('')}</div>
+    const q=LINES.filter(l=>l.m===m).reduce((a,l)=>a+(S.order[l.key]||0),0);
+    return `<button class="item" style="--c:${cur.c}" onclick="tap('${m.id}')">${q?`<span class="badge">${q}</span>`:''}
+    <span class="e">${m.e}</span><span class="n">${m.n}</span>${(m.s||m.opts)?`<span class="sub">${m.s||'au choix'}</span>`:''}<span class="p">${tp(m)}</span></button>`}).join('')}</div>
   <div class="bar"><div class="in">
     <div class="tot">${c} article${c>1?'s':''}<b>${eur(t)}</b></div>
     <button class="btn small" onclick="S.order={};render()" ${c?'':'disabled'}>Vider</button>
@@ -186,10 +198,10 @@ function menuView(){
 }
 
 function lines(){
-  return MENU.filter(m=>S.order[m.id]).map(m=>`<div class="row" style="align-items:center">
-    <span>${m.e} ${m.n}</span>
-    <span class="qty"><button onclick="less('${m.id}')">−</button><b>${S.order[m.id]}</b><button onclick="add('${m.id}')">+</button>
-    <span style="min-width:74px;text-align:right">${eur(m.p*S.order[m.id])}</span></span></div>`).join('');
+  return LINES.filter(l=>S.order[l.key]).map(l=>`<div class="row" style="align-items:center">
+    <span>${l.e} ${l.name}</span>
+    <span class="qty"><button onclick="less('${l.key}')">−</button><b>${S.order[l.key]}</b><button onclick="add('${l.key}')">+</button>
+    <span style="min-width:74px;text-align:right">${eur(l.p*S.order[l.key])}</span></span></div>`).join('');
 }
 
 function ticketView(){
@@ -233,6 +245,13 @@ function doneView(){
   <button class="btn go" onclick="newOrder()">Client suivant 👋</button></div>`;
 }
 
+function pickSheet(){
+  const m=MENU.find(x=>x.id===S.pick);
+  return `<div class="veil" onclick="S.pick=null;render()"></div><div class="sheet"><h2>${m.e} ${m.n} : choisis !</h2>
+  <div class="opts">${m.opts.map(o=>`<button class="opt" onclick="pick('${m.id}|${o.n}')"><span class="dot" style="background:${o.c}"></span>${o.n}<small>${eur(o.p)}</small></button>`).join('')}</div>
+  <button class="btn small" onclick="S.pick=null;render()">Annuler</button></div>`;
+}
+function menuView(){return menuBase()+(S.pick?pickSheet():'')}
 function render(){
   $({menu:menuView,ticket:ticketView,pay:payView,card:cardView,done:doneView}[S.view]());
   window.scrollTo(0,0);
