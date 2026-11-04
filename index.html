@@ -97,6 +97,7 @@ h1{font-size:26px;margin:0;font-weight:700}
 <div class="app" id="app"></div>
 <script>
 const CATS=[
+ {id:'ptidej',n:'Pti Dej',e:'🥐',c:'#12A8A0'},
  {id:'boissons',n:'Boissons',e:'🥤',c:'#3E9BF2'},
  {id:'entrees',n:'Entrées',e:'🥗',c:'#3FAE5A'},
  {id:'pizzas',n:'Pizzas',e:'🍕',c:'#F2557A'},
@@ -104,6 +105,10 @@ const CATS=[
  {id:'desserts',n:'Desserts',e:'🍰',c:'#8E6BD6'}
 ];
 const MENU=[
+ {id:'painchoc',k:'ptidej',e:'🍫',n:'Pain au chocolat',p:100},
+ {id:'croissant',k:'ptidej',e:'🥐',n:'Croissant',p:90},
+ {id:'gaufre',k:'ptidej',e:'🧇',n:'Gaufre',p:120},
+ {id:'oeufs',k:'ptidej',e:'🍳',n:'Œufs',p:40},
  {id:'cafe',k:'boissons',e:'☕',n:'Café',p:150},
  {id:'cappu',k:'boissons',e:'☕',n:'Cappuccino',p:200},
  {id:'the',k:'boissons',e:'🍵',n:'Thé',p:150},
@@ -136,7 +141,7 @@ const MENU=[
 const BILLS=[10,20,50,100,200,500,1000,2000,5000]; // en centimes
 const LINES=MENU.flatMap(m=>m.opts?m.opts.map(o=>({key:m.id+'|'+o.n,m,e:m.e,name:m.n+' · '+o.n,p:o.p,k:m.k})):[{key:m.id,m,e:m.e,name:m.n,p:m.p,k:m.k}]);
 const tp=m=>{if(!m.opts)return eur(m.p);const lo=Math.min(...m.opts.map(o=>o.p));return m.opts.every(o=>o.p===lo)?eur(lo):'dès '+eur(lo)};
-let S={view:'menu',pick:null,cat:'boissons',order:{},given:0,client:1,caisse:0,paid:'',change:0};
+let S={view:'menu',pick:null,cat:'ptidej',order:{},given:0,client:1,caisse:0,paid:'',change:0};
 const eur=c=>(c/100).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
 const total=()=>LINES.reduce((t,l)=>t+l.p*(S.order[l.key]||0),0);
 const count=()=>Object.values(S.order).reduce((a,b)=>a+b,0);
